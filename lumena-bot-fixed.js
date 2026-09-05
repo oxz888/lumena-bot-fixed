@@ -92,6 +92,40 @@
         return true;
     }
 
+    function performForcedLumenSwitchStep() {
+        let team = document.querySelector('.battle-team--forced');
+        if (!team) {
+            const candidate = document.querySelector('.battle-team');
+            const title = candidate?.querySelector('.battle-team__title');
+            if (/choose your next lumen/i.test(title?.textContent || '')) team = candidate;
+        }
+        if (!team) return null;
+
+        // Sesudah satu Lumen dipilih, Lumena menampilkan tombol konfirmasi.
+        const actions = Array.from(team.querySelectorAll('.battle-team__action'));
+        const confirm = actions.find(button => {
+            const label = (button.getAttribute?.('aria-label') || button.innerText || button.textContent || '').trim();
+            return !button.disabled && /^swap lumens$/i.test(label);
+        });
+        if (confirm) {
+            confirm.click();
+            return 'confirmed';
+        }
+
+        // Pilih cadangan hidup pertama; jangan pernah memilih Lumen fainted/disabled.
+        const rows = Array.from(team.querySelectorAll('.hud-menu__lumen-row'));
+        const reserve = rows.find(row =>
+            !row.disabled &&
+            !row.classList.contains('hud-menu__lumen-row--fainted') &&
+            !row.classList.contains('hud-menu__lumen-row--disabled') &&
+            !/\b(?:fnt|fainted|in battle)\b/i.test(row.innerText || row.textContent || '')
+        );
+        if (!reserve) return 'waiting';
+
+        reserve.click();
+        return 'selected';
+    }
+
     function detectEnemyLumen() {
         let name = '';
         let isShiny = false;
@@ -354,7 +388,22 @@
             return;
         }
 
-        // 2. Pertarungan / Battle
+        // 2. Jika Lumen aktif kalah, pilih otomatis cadangan yang masih hidup.
+        const switchStep = performForcedLumenSwitchStep();
+        if (switchStep) {
+            isBusy = true;
+            if (isHoldingFish) releaseFishHold();
+            updateStatus(switchStep === 'confirmed'
+                ? 'Lumen pengganti masuk...'
+                : switchStep === 'selected'
+                    ? 'Memilih Lumen yang masih hidup...'
+                    : 'Menunggu Lumen pengganti...');
+            await sleep(350);
+            isBusy = false;
+            return;
+        }
+
+        // 3. Pertarungan / Battle
         if (isInBattle()) {
             isBusy = true;
             if (isHoldingFish) releaseFishHold();
@@ -399,13 +448,13 @@
 
         activeEncounterHandled = false;
 
-        // 3. Cek Auto Pancing jika di dekat air atau sedang mancing
+        // 4. Cek Auto Pancing jika di dekat air atau sedang mancing
         const isFishingActive = handleAutoFishing();
         if (isFishingActive) {
             return;
         }
 
-        // 4. Jika tidak sedang mancing -> auto walk hunting rumput
+        // 5. Jika tidak sedang mancing -> auto walk hunting rumput
         triggerWalkStep();
     }
 
