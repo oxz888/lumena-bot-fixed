@@ -130,49 +130,44 @@
         let name = '';
         let isShiny = false;
 
-        if (
-            document.querySelector('.lumen-shiny') ||
-            document.querySelector('[class*="lumen-shiny"]') ||
-            document.querySelector('.battle-enemy--shiny') ||
-            document.querySelector('[style*="--shiny-filter"]')
-        ) {
-            isShiny = true;
+        // DOM Lumena saat ini mempunyai HUD terpisah untuk ally dan enemy.
+        // Semua deteksi wajib dibatasi ke HUD enemy agar Lumen milik pemain
+        // (termasuk shiny/target) tidak salah dianggap sebagai musuh.
+        const enemyHud = document.querySelector('.battle-monster-hud--enemy');
+        if (enemyHud) {
+            const nameEl = enemyHud.querySelector('.battle-monster-hud__name-row strong') ||
+                enemyHud.querySelector('.battle-monster-hud__name-row');
+            name = (nameEl?.textContent || '').replace(/✨/g, '').trim();
+            isShiny = !!enemyHud.querySelector('.lumen-shiny-mark') ||
+                (nameEl?.textContent || '').includes('✨');
+            return { name: name || 'Unknown Lumen', isShiny };
         }
 
-        const battleElements = document.querySelectorAll('.battle-ui, .battle-enemy, .battle-header, .battle-field');
-        for (const el of battleElements) {
-            if (el.textContent && (el.textContent.includes('✨') || el.textContent.toLowerCase().includes('shiny'))) {
-                isShiny = true;
-                break;
-            }
-        }
-
-        const enemyNameSelectors = [
-            '.battle-enemy-info__name',
-            '.battle-enemy__name',
-            '.battle-foe__name',
-            '.battle-opponent__name',
-            '.battle-enemy-card__title',
-            '[data-battle-enemy-name]'
-        ];
-        for (const s of enemyNameSelectors) {
-            const el = document.querySelector(s);
-            if (el && el.textContent) {
-                name = el.textContent.replace('✨', '').trim();
-                break;
-            }
-        }
-
-        if (!name) {
-            const fullBattleText = document.querySelector('.battle-ui')?.innerText || '';
-            for (const t of CONFIG.TARGET_LIST) {
-                if (new RegExp('\\b' + t + '\\b', 'i').test(fullBattleText)) {
-                    name = t;
+        // Fallback untuk layout lama, tetap hanya mencari di kontainer musuh.
+        const enemyRoot = document.querySelector('.battle-enemy, .battle-foe, .battle-opponent');
+        if (enemyRoot) {
+            const enemyNameSelectors = [
+                '.battle-enemy-info__name',
+                '.battle-enemy__name',
+                '.battle-foe__name',
+                '.battle-opponent__name',
+                '.battle-enemy-card__title',
+                '[data-battle-enemy-name]'
+            ];
+            for (const selector of enemyNameSelectors) {
+                const el = enemyRoot.matches?.(selector) ? enemyRoot : enemyRoot.querySelector(selector);
+                if (el?.textContent) {
+                    name = el.textContent.replace(/✨/g, '').trim();
                     break;
                 }
             }
+            const enemyText = enemyRoot.textContent || '';
+            isShiny = !!enemyRoot.querySelector('.lumen-shiny, .lumen-shiny-mark, .battle-enemy--shiny, [style*="--shiny-filter"]') ||
+                enemyText.includes('✨') || /\bshiny\b/i.test(enemyText);
         }
 
+        // Gagal membaca identitas musuh harus bersifat aman: serang, jangan
+        // menghabiskan Lantern berdasarkan nama/shiny dari bagian UI lain.
         return { name: name || 'Unknown Lumen', isShiny };
     }
 
