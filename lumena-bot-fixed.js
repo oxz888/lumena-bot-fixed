@@ -5,19 +5,21 @@
 
     const CONFIG = {
         TARGET_LIST: [
-            "Marebyte", "Lithlet", "Glimfin", "Murkub", "Cinderook",
-            "Ditpuff", "Starcalf", "Compasspook", "Transmole", "Nullimp",
-            "Capsylex", "Corekit", "Lunaveil", "Chronobra", "Etherion",
-            "Solshade"
+            "Marebyte", "Lotlume", "Lithlet", "Cairnling", "Glimfin",
+            "Cinderook", "Combustler", "Sparkit", "Volterin", "Ditpuff",
+            "Mimicorp", "Starcalf", "Cosmox", "Compasspook", "Astrowraith",
+            "Nullimp", "Voidling", "Murkub", "Cindergill", "Capsylex",
+            "Corekit", "Lunaveil", "Chronobra", "Etherion", "Solshade",
+            "Bitauro"
         ],
         ALWAYS_CATCH_SHINY: true,
         XP_FARM_OTHERS: true,
         AUTO_FISHING: true, // Auto pancing aktif
         ACTION_DELAY_MS: 1100,
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
-        WALK_STEP_DELAY_MS: 650,
-        WALK_HOLD_MS: 60,
-        WALK_RETURN_GAP_MS: 30,
+        WALK_STEP_DELAY_MS: 1000,
+        WALK_HOLD_MS: 30,
+        WALK_RETURN_GAP_MS: 20,
         AUTO_WALK: true
     };
 
