@@ -131,9 +131,33 @@
         return 'selected';
     }
 
+    function evaluateGradeCapture(grades) {
+        const normalized = Array.from(grades || [])
+            .map(grade => String(grade || '').trim().toUpperCase())
+            .filter(grade => /^[SABCDE]$/.test(grade));
+        const counts = normalized.reduce((result, grade) => {
+            result[grade] = (result[grade] || 0) + 1;
+            return result;
+        }, {});
+        const complete = normalized.length === 6;
+        const allS = complete && counts.S === 6;
+        const allA = complete && counts.A === 6;
+        const allB = complete && counts.B === 6;
+
+        let reason = '';
+        if (allS) reason = 'semua grade S';
+        else if (allA) reason = 'semua grade A';
+        else if (allB) reason = 'semua grade B';
+        else if ((counts.S || 0) >= 2) reason = `${counts.S} grade S`;
+        else if ((counts.A || 0) >= 3) reason = `${counts.A} grade A`;
+
+        return { capture: !!reason, reason, grades: normalized, counts };
+    }
+
     function detectEnemyLumen() {
         let name = '';
         let isShiny = false;
+        let grades = [];
 
         // DOM Lumena saat ini mempunyai HUD terpisah untuk ally dan enemy.
         // Semua deteksi wajib dibatasi ke HUD enemy agar Lumen milik pemain
@@ -145,7 +169,11 @@
             name = (nameEl?.textContent || '').replace(/✨/g, '').trim();
             isShiny = !!enemyHud.querySelector('.lumen-shiny-mark') ||
                 (nameEl?.textContent || '').includes('✨');
-            return { name: name || 'Unknown Lumen', isShiny };
+            grades = Array.from(enemyHud.querySelectorAll('.battle-monster-hud__etherlens-grades [data-grade]'))
+                .map(el => el.getAttribute('data-grade') || el.dataset?.grade || '')
+                .map(grade => grade.toUpperCase())
+                .filter(grade => /^[SABCDE]$/.test(grade));
+            return { name: name || 'Unknown Lumen', isShiny, grades };
         }
 
         // Fallback untuk layout lama, tetap hanya mencari di kontainer musuh.
@@ -173,7 +201,36 @@
 
         // Gagal membaca identitas musuh harus bersifat aman: serang, jangan
         // menghabiskan Lantern berdasarkan nama/shiny dari bagian UI lain.
-        return { name: name || 'Unknown Lumen', isShiny };
+        return { name: name || 'Unknown Lumen', isShiny, grades };
+    }
+
+    function findPreferredLantern() {
+        const modernItems = Array.from(document.querySelectorAll('.battle-item-overlay__item:not([disabled])'));
+        const fallbackItems = Array.from(document.querySelectorAll('.battle-item, .battle-bag__item, button, .item-card'))
+            .filter(el => !el.disabled && /lantern/i.test(el.textContent || el.getAttribute?.('aria-label') || ''));
+        const items = [...new Set([...modernItems, ...fallbackItems])];
+        const priorities = ['wisp lantern', 'ember lantern', 'aurora lantern', 'nova lantern'];
+
+        for (const lanternName of priorities) {
+            const match = items.find(el =>
+                (el.textContent || el.getAttribute?.('aria-label') || '').toLowerCase().includes(lanternName)
+            );
+            if (match) return match;
+        }
+
+        const legacySelectors = [
+            '[data-item-id="wisp_lantern"]',
+            '[data-item-category="capture_lantern"]',
+            '[data-item-id*="lantern"]',
+            '.battle-item-lantern',
+            '.battle-item--capture',
+            '.item-card--lantern'
+        ];
+        for (const selector of legacySelectors) {
+            const item = document.querySelector(selector);
+            if (item && !item.disabled) return item;
+        }
+        return null;
     }
 
     async function executeCapture() {
@@ -186,24 +243,7 @@
             await sleep(CONFIG.ACTION_DELAY_MS);
         }
 
-        const lanternSelectors = [
-            '[data-item-category="capture_lantern"]',
-            '[data-item-id*="lantern"]',
-            '.battle-item-lantern',
-            '.battle-item--capture',
-            '.item-card--lantern'
-        ];
-
-        let lanternItem = null;
-        for (const s of lanternSelectors) {
-            lanternItem = document.querySelector(s);
-            if (lanternItem) break;
-        }
-
-        if (!lanternItem) {
-            const allItems = Array.from(document.querySelectorAll('.battle-item, .battle-bag__item, button, .item-card'));
-            lanternItem = allItems.find(el => /lantern/i.test(el.textContent || el.getAttribute('aria-label') || ''));
-        }
+        const lanternItem = findPreferredLantern();
 
         if (lanternItem) {
             updateStatus('Menggunakan Lantern...');
@@ -448,6 +488,7 @@
             const enemy = detectEnemyLumen();
             const normalizedName = enemy.name.toLowerCase().trim();
             const isTarget = TARGET_SET.has(normalizedName);
+            const gradeDecision = evaluateGradeCapture(enemy.grades);
 
             if (enemy.isShiny) {
                 updateStatus(`✨ SHINY: [${enemy.name}]! Tangkap...`);
@@ -460,6 +501,15 @@
                 await executeCapture();
             } else if (isTarget) {
                 updateStatus(`🎯 TARGET: [${enemy.name}]! Tangkap...`);
+                if (!activeEncounterHandled) {
+                    STATS.encounters++;
+                    STATS.targetCaught++;
+                    activeEncounterHandled = true;
+                    renderHUD();
+                }
+                await executeCapture();
+            } else if (gradeDecision.capture) {
+                updateStatus(`🧬 GRADE: [${enemy.name}] ${gradeDecision.reason}! Tangkap...`);
                 if (!activeEncounterHandled) {
                     STATS.encounters++;
                     STATS.targetCaught++;

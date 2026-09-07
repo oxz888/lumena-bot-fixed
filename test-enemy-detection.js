@@ -16,7 +16,8 @@ function el(text = '', children = {}) {
   return {
     textContent: text,
     innerText: text,
-    querySelector: selector => children[selector] || null
+    querySelector: selector => children[selector] || null,
+    querySelectorAll: () => []
   };
 }
 function detect({ enemyName, enemyShiny = false, allyName = 'Marebyte', allyShiny = true }) {
@@ -49,12 +50,12 @@ function detect({ enemyName, enemyShiny = false, allyName = 'Marebyte', allyShin
 
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(detect({ enemyName: 'Wildmon' }))),
-  { name: 'Wildmon', isShiny: false },
+  { name: 'Wildmon', isShiny: false, grades: [] },
   'ally target/shiny must not make a normal enemy catchable'
 );
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(detect({ enemyName: 'Chronobra', enemyShiny: false, allyShiny: false }))),
-  { name: 'Chronobra', isShiny: false },
+  { name: 'Chronobra', isShiny: false, grades: [] },
   'must read the enemy name from the enemy HUD'
 );
 assert.strictEqual(detect({ enemyName: 'Wildmon', enemyShiny: true, allyShiny: false }).isShiny, true);
