@@ -10,13 +10,15 @@ vm.createContext(context);
 vm.runInContext(source.slice(start, end).replace('const CONFIG', 'this.CONFIG'), context);
 
 const expected = [
-  'Marebyte', 'Lotlume', 'Lithlet', 'Cairnling', 'Glimfin',
-  'Cinderook', 'Combustler', 'Sparkit', 'Volterin', 'Ditpuff',
-  'Mimicorp', 'Starcalf', 'Cosmox', 'Compasspook', 'Astrowraith',
-  'Nullimp', 'Voidling', 'Murkub', 'Cindergill', 'Capsylex',
-  'Corekit', 'Lunaveil', 'Chronobra', 'Etherion', 'Solshade', 'Bitauro'
+  'Transmole', 'Marebyte', 'Lotlume', 'Lithlet', 'Cairnling',
+  'Glimfin', 'Cinderook', 'Combustler', 'Sparkit', 'Volterin',
+  'Ditpuff', 'Mimicorp', 'Starcalf', 'Cosmox', 'Compasspook',
+  'Astrowraith', 'Nullimp', 'Voidling', 'Murkub', 'Cindergill',
+  'Capsylex', 'Corekit', 'Lunaveil', 'Chronobra', 'Etherion',
+  'Solshade', 'Bitauro'
 ];
 assert.deepStrictEqual(JSON.parse(JSON.stringify(context.CONFIG.TARGET_LIST)), expected);
-assert(context.CONFIG.WALK_HOLD_MS <= 35, 'anchor movement pulse must be tiny to limit drift');
-assert(context.CONFIG.WALK_STEP_DELAY_MS >= 900, 'anchor movement must not fire too frequently');
-console.log('PASS: target list is exact and anchored movement is tightly bounded');
+assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');
+assert.strictEqual(context.CONFIG.WALK_HOLD_MS, 75, 'movement duration must be exactly 75ms');
+assert.strictEqual(context.CONFIG.WALK_STEP_DELAY_MS, 750, 'movement interval must be exactly 750ms');
+console.log('PASS: target list, shiny priority, and movement timing are exact');

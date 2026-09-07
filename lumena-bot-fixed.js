@@ -5,7 +5,7 @@
 
     const CONFIG = {
         TARGET_LIST: [
-            "Marebyte", "Lotlume", "Lithlet", "Cairnling", "Glimfin",
+            "Transmole", "Marebyte", "Lotlume", "Lithlet", "Cairnling", "Glimfin",
             "Cinderook", "Combustler", "Sparkit", "Volterin", "Ditpuff",
             "Mimicorp", "Starcalf", "Cosmox", "Compasspook", "Astrowraith",
             "Nullimp", "Voidling", "Murkub", "Cindergill", "Capsylex",
@@ -17,8 +17,8 @@
         AUTO_FISHING: true, // Auto pancing aktif
         ACTION_DELAY_MS: 1100,
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
-        WALK_STEP_DELAY_MS: 1000,
-        WALK_HOLD_MS: 30,
+        WALK_STEP_DELAY_MS: 750,
+        WALK_HOLD_MS: 75,
         WALK_RETURN_GAP_MS: 20,
         AUTO_WALK: true
     };
