@@ -33,7 +33,7 @@
 
     let isBusy = false;
     let isHoldingFish = false;
-    let walkDirection = 'KeyA';
+    let walkDirection = 'KeyS';
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
@@ -344,15 +344,26 @@
     // AUTO-WALK DI RUMPUT (JIKA TIDAK SEDANG MANCING)
     // =========================================================================
 
+    function nextWalkDirection(current) {
+        const directions = ['KeyD', 'KeyA', 'KeyW', 'KeyS'];
+        const index = directions.indexOf(current);
+        return directions[(index + 1) % directions.length];
+    }
+
     function triggerWalkStep() {
         if (!CONFIG.AUTO_WALK || isInBattle() || document.querySelector('.fishing-game')) return;
         const now = Date.now();
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        walkDirection = (walkDirection === 'KeyA') ? 'KeyD' : 'KeyA';
-        const key = (walkDirection === 'KeyA') ? 'a' : 'd';
-        const keyCode = (walkDirection === 'KeyA') ? 65 : 68;
+        walkDirection = nextWalkDirection(walkDirection);
+        const controls = {
+            KeyD: { key: 'd', keyCode: 68, label: 'kanan' },
+            KeyA: { key: 'a', keyCode: 65, label: 'kiri' },
+            KeyW: { key: 'w', keyCode: 87, label: 'atas' },
+            KeyS: { key: 's', keyCode: 83, label: 'bawah' }
+        };
+        const { key, keyCode, label } = controls[walkDirection];
 
         const downEvent = new KeyboardEvent('keydown', {
             bubbles: true, cancelable: true, key, code: walkDirection, keyCode, which: keyCode
@@ -363,7 +374,7 @@
 
         window.dispatchEvent(downEvent);
         setTimeout(() => window.dispatchEvent(upEvent), 150);
-        updateStatus(`Exploring rumput... [${walkDirection}]`);
+        updateStatus(`Exploring rumput... [${label}]`);
     }
 
     async function botLoopStep() {
