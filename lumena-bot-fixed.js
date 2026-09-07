@@ -15,7 +15,9 @@
         AUTO_FISHING: true, // Auto pancing aktif
         ACTION_DELAY_MS: 1100,
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
-        WALK_STEP_DELAY_MS: 400,
+        WALK_STEP_DELAY_MS: 650,
+        WALK_HOLD_MS: 60,
+        WALK_RETURN_GAP_MS: 30,
         AUTO_WALK: true
     };
 
@@ -37,6 +39,7 @@
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
+    let isWalking = false;
 
     const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -350,31 +353,57 @@
         return directions[(index + 1) % directions.length];
     }
 
-    function triggerWalkStep() {
-        if (!CONFIG.AUTO_WALK || isInBattle() || document.querySelector('.fishing-game')) return;
+    function getWalkExcursion(direction) {
+        const opposite = {
+            KeyD: 'KeyA',
+            KeyA: 'KeyD',
+            KeyW: 'KeyS',
+            KeyS: 'KeyW'
+        };
+        return [direction, opposite[direction]];
+    }
+
+    function getWalkControl(direction) {
+        return {
+            KeyD: { key: 'd', keyCode: 68, label: 'kanan' },
+            KeyA: { key: 'a', keyCode: 65, label: 'kiri' },
+            KeyW: { key: 'w', keyCode: 87, label: 'atas' },
+            KeyS: { key: 's', keyCode: 83, label: 'bawah' }
+        }[direction];
+    }
+
+    async function pulseWalkKey(direction) {
+        const { key, keyCode } = getWalkControl(direction);
+        window.dispatchEvent(new KeyboardEvent('keydown', {
+            bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
+        }));
+        await sleep(CONFIG.WALK_HOLD_MS);
+        window.dispatchEvent(new KeyboardEvent('keyup', {
+            bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
+        }));
+    }
+
+    async function triggerWalkStep() {
+        if (!CONFIG.AUTO_WALK || isWalking || isInBattle() || document.querySelector('.fishing-game')) return;
         const now = Date.now();
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
         walkDirection = nextWalkDirection(walkDirection);
-        const controls = {
-            KeyD: { key: 'd', keyCode: 68, label: 'kanan' },
-            KeyA: { key: 'a', keyCode: 65, label: 'kiri' },
-            KeyW: { key: 'w', keyCode: 87, label: 'atas' },
-            KeyS: { key: 's', keyCode: 83, label: 'bawah' }
-        };
-        const { key, keyCode, label } = controls[walkDirection];
+        const [outbound, inbound] = getWalkExcursion(walkDirection);
+        const { label } = getWalkControl(outbound);
 
-        const downEvent = new KeyboardEvent('keydown', {
-            bubbles: true, cancelable: true, key, code: walkDirection, keyCode, which: keyCode
-        });
-        const upEvent = new KeyboardEvent('keyup', {
-            bubbles: true, cancelable: true, key, code: walkDirection, keyCode, which: keyCode
-        });
-
-        window.dispatchEvent(downEvent);
-        setTimeout(() => window.dispatchEvent(upEvent), 150);
-        updateStatus(`Exploring rumput... [${label}]`);
+        // Bergerak sedikit lalu segera menekan arah kebalikan dengan durasi sama.
+        // Ini membuat karakter menjelajah empat arah tanpa terus menjauh dari titik awal.
+        isWalking = true;
+        try {
+            updateStatus(`Exploring dekat titik awal... [${label}]`);
+            await pulseWalkKey(outbound);
+            await sleep(CONFIG.WALK_RETURN_GAP_MS);
+            await pulseWalkKey(inbound);
+        } finally {
+            isWalking = false;
+        }
     }
 
     async function botLoopStep() {
@@ -461,7 +490,7 @@
         }
 
         // 5. Jika tidak sedang mancing -> auto walk hunting rumput
-        triggerWalkStep();
+        await triggerWalkStep();
     }
 
     function createHUD() {
