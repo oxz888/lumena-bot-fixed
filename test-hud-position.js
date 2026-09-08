@@ -6,7 +6,7 @@ const end = source.indexOf('`;', start);
 assert(start >= 0 && end > start, 'HUD style block must exist');
 const css = source.slice(start, end);
 assert(/position:\s*fixed/.test(css), 'HUD must remain fixed');
-assert(/top:\s*50%/.test(css), 'HUD must be vertically centered');
+assert(/top:\s*25%/.test(css), 'HUD must be positioned 25% from the top');
 assert(/left:\s*10px/.test(css), 'HUD must be placed on the left');
 assert(/transform:\s*translateY\(-50%\)/.test(css), 'HUD centering transform must be present');
 assert(!/right:\s*10px/.test(css), 'old top-right placement must be removed');
