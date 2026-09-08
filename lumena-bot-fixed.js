@@ -550,8 +550,9 @@
         hud.id = 'lumena-bot-hud';
         hud.style.cssText = `
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
             z-index: 9999999;
             max-width: 270px;
             width: calc(100vw - 20px);
