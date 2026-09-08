@@ -10,7 +10,7 @@
             "Mimicorp", "Starcalf", "Cosmox", "Compasspook", "Astrowraith",
             "Nullimp", "Voidling", "Murkub", "Cindergill", "Capsylex",
             "Corekit", "Lunaveil", "Chronobra", "Etherion", "Solshade",
-            "Bitauro"
+            "Bitauro", "Mythrex", "Originu", "Lunimp", "Vowraith"
         ],
         ALWAYS_CATCH_SHINY: true,
         XP_FARM_OTHERS: true,

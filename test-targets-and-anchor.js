@@ -15,7 +15,7 @@ const expected = [
   'Ditpuff', 'Mimicorp', 'Starcalf', 'Cosmox', 'Compasspook',
   'Astrowraith', 'Nullimp', 'Voidling', 'Murkub', 'Cindergill',
   'Capsylex', 'Corekit', 'Lunaveil', 'Chronobra', 'Etherion',
-  'Solshade', 'Bitauro'
+  'Solshade', 'Bitauro', 'Mythrex', 'Originu', 'Lunimp', 'Vowraith'
 ];
 assert.deepStrictEqual(JSON.parse(JSON.stringify(context.CONFIG.TARGET_LIST)), expected);
 assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');
