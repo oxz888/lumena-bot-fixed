@@ -14,14 +14,20 @@ function extractFunction(name) {
 }
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('getWalkExcursion')}\nthis.get=getWalkExcursion;`, context);
-const expected = {
-  KeyD: ['KeyD', 'KeyA'],
-  KeyA: ['KeyA', 'KeyD'],
-  KeyW: ['KeyW', 'KeyS'],
-  KeyS: ['KeyS', 'KeyW']
-};
-for (const [direction, pair] of Object.entries(expected)) {
-  assert.deepStrictEqual(JSON.parse(JSON.stringify(context.get(direction))), pair);
+vm.runInContext(`${extractFunction('nextWalkDirection')}\nthis.next=nextWalkDirection;`, context);
+let direction = 'KeyS';
+const position = { x: 0, y: 0 };
+let maxAbsX = 0;
+let maxAbsY = 0;
+for (let i = 0; i < 4; i++) {
+  direction = context.next(direction);
+  if (direction === 'KeyD') position.x++;
+  if (direction === 'KeyA') position.x--;
+  if (direction === 'KeyW') position.y++;
+  if (direction === 'KeyS') position.y--;
+  maxAbsX = Math.max(maxAbsX, Math.abs(position.x));
+  maxAbsY = Math.max(maxAbsY, Math.abs(position.y));
 }
-console.log('PASS: every four-direction step immediately returns toward the anchor');
+assert.deepStrictEqual(position, { x: 0, y: 0 }, 'one loop must return to the anchor');
+assert(maxAbsX <= 1 && maxAbsY <= 1, 'loop must stay within one movement unit of the anchor');
+console.log('PASS: square loop stays near the anchor and returns to start');

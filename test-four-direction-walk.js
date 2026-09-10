@@ -25,6 +25,14 @@ for (let i = 0; i < 4; i++) {
   current = context.next(current);
   seen.push(current);
 }
-assert.deepStrictEqual(seen, ['KeyD', 'KeyA', 'KeyW', 'KeyS']);
+assert.deepStrictEqual(seen, ['KeyD', 'KeyW', 'KeyA', 'KeyS']);
 assert.deepStrictEqual(new Set(seen), new Set(['KeyA', 'KeyD', 'KeyW', 'KeyS']));
-console.log('PASS: walking cycles right left up down');
+const displacement = seen.reduce((p, direction) => {
+  if (direction === 'KeyD') p.x++;
+  if (direction === 'KeyA') p.x--;
+  if (direction === 'KeyW') p.y++;
+  if (direction === 'KeyS') p.y--;
+  return p;
+}, { x: 0, y: 0 });
+assert.deepStrictEqual(displacement, { x: 0, y: 0 });
+console.log('PASS: walking makes a right up left down loop back to start');

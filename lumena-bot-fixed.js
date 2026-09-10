@@ -19,7 +19,6 @@
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
         WALK_STEP_DELAY_MS: 750,
         WALK_HOLD_MS: 75,
-        WALK_RETURN_GAP_MS: 20,
         AUTO_WALK: true
     };
 
@@ -390,19 +389,9 @@
     // =========================================================================
 
     function nextWalkDirection(current) {
-        const directions = ['KeyD', 'KeyA', 'KeyW', 'KeyS'];
+        const directions = ['KeyD', 'KeyW', 'KeyA', 'KeyS'];
         const index = directions.indexOf(current);
         return directions[(index + 1) % directions.length];
-    }
-
-    function getWalkExcursion(direction) {
-        const opposite = {
-            KeyD: 'KeyA',
-            KeyA: 'KeyD',
-            KeyW: 'KeyS',
-            KeyS: 'KeyW'
-        };
-        return [direction, opposite[direction]];
     }
 
     function getWalkControl(direction) {
@@ -432,17 +421,14 @@
         lastWalkTime = now;
 
         walkDirection = nextWalkDirection(walkDirection);
-        const [outbound, inbound] = getWalkExcursion(walkDirection);
-        const { label } = getWalkControl(outbound);
+        const { label } = getWalkControl(walkDirection);
 
-        // Bergerak sedikit lalu segera menekan arah kebalikan dengan durasi sama.
-        // Ini membuat karakter menjelajah empat arah tanpa terus menjauh dari titik awal.
+        // Empat langkah membentuk putaran kanan → atas → kiri → bawah.
+        // Karena tiap arah berdurasi sama, satu putaran kembali ke titik awal.
         isWalking = true;
         try {
             updateStatus(`Exploring dekat titik awal... [${label}]`);
-            await pulseWalkKey(outbound);
-            await sleep(CONFIG.WALK_RETURN_GAP_MS);
-            await pulseWalkKey(inbound);
+            await pulseWalkKey(walkDirection);
         } finally {
             isWalking = false;
         }
