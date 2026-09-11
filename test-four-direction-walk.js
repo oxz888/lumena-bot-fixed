@@ -20,8 +20,8 @@ vm.createContext(context);
 vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(75);`, context);
 const plan = JSON.parse(JSON.stringify(context.plan));
 assert.deepStrictEqual(plan, [
-  { direction: 'KeyD', holdMs: 225 },
-  { direction: 'KeyA', holdMs: 225 }
+  { direction: 'KeyD', holdMs: 675 },
+  { direction: 'KeyA', holdMs: 675 }
 ]);
 assert.strictEqual(plan[0].holdMs, plan[1].holdMs, 'return run must match outbound run');
-console.log('PASS: walking holds right for 3 steps then immediately holds left for 3 steps');
+console.log('PASS: horizontal run is 3x longer and balances back to start');

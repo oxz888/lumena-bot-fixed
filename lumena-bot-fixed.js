@@ -389,7 +389,8 @@
     // =========================================================================
 
     function getWalkRunPlan(stepDurationMs) {
-        const runDurationMs = stepDurationMs * 3;
+        // Tiga kali lebih jauh dari versi 225 ms sebelumnya.
+        const runDurationMs = stepDurationMs * 9;
         return [
             { direction: 'KeyD', holdMs: runDurationMs },
             { direction: 'KeyA', holdMs: runDurationMs }
