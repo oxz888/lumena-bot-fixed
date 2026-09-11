@@ -389,7 +389,7 @@
     // =========================================================================
 
     function getWalkPattern() {
-        return ['KeyD', 'KeyD', 'KeyW', 'KeyA', 'KeyA', 'KeyS'];
+        return ['KeyD', 'KeyD', 'KeyD', 'KeyA', 'KeyA', 'KeyA'];
     }
 
     function getWalkControl(direction) {
@@ -423,8 +423,8 @@
         const walkDirection = walkPattern[walkStepIndex];
         const { label } = getWalkControl(walkDirection);
 
-        // Enam langkah membentuk putaran kanan → kanan → atas → kiri → kiri → bawah.
-        // Karena jarak horizontal dan vertikal seimbang, putaran kembali ke titik awal.
+        // Bergerak lurus tiga langkah ke kanan lalu tiga langkah kembali ke kiri.
+        // Jarak horizontal seimbang sehingga putaran kembali ke titik awal.
         isWalking = true;
         try {
             updateStatus(`Exploring dekat titik awal... [${label}]`);

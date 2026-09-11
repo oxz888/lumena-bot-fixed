@@ -19,14 +19,10 @@ const context = {};
 vm.createContext(context);
 vm.runInContext(`${extractFunction('getWalkPattern')}\nthis.pattern=getWalkPattern();`, context);
 const seen = JSON.parse(JSON.stringify(context.pattern));
-assert.deepStrictEqual(seen, ['KeyD', 'KeyD', 'KeyW', 'KeyA', 'KeyA', 'KeyS']);
+assert.deepStrictEqual(seen, ['KeyD', 'KeyD', 'KeyD', 'KeyA', 'KeyA', 'KeyA']);
+assert(!seen.includes('KeyW') && !seen.includes('KeyS'), 'movement must remain horizontal');
 
-const displacement = seen.reduce((position, direction) => {
-  if (direction === 'KeyD') position.x++;
-  if (direction === 'KeyA') position.x--;
-  if (direction === 'KeyW') position.y++;
-  if (direction === 'KeyS') position.y--;
-  return position;
-}, { x: 0, y: 0 });
-assert.deepStrictEqual(displacement, { x: 0, y: 0 });
-console.log('PASS: walking makes a 2-right up 2-left down loop back to start');
+const displacement = seen.reduce((x, direction) =>
+  x + (direction === 'KeyD' ? 1 : direction === 'KeyA' ? -1 : 0), 0);
+assert.strictEqual(displacement, 0, 'three right and three left steps must return to start');
+console.log('PASS: walking runs 3 steps right then 3 steps left');

@@ -27,5 +27,6 @@ for (const direction of context.pattern) {
   maxAbsY = Math.max(maxAbsY, Math.abs(position.y));
 }
 assert.deepStrictEqual(position, { x: 0, y: 0 }, 'one loop must return to the anchor');
-assert(maxAbsX <= 2 && maxAbsY <= 1, 'loop must stay inside its small rectangular area');
-console.log('PASS: rectangular loop stays near the anchor and returns to start');
+assert(maxAbsX <= 3, 'loop must stay within three horizontal movement units of the anchor');
+assert.strictEqual(maxAbsY, 0, 'loop must never move vertically');
+console.log('PASS: horizontal loop stays near the anchor and returns to start');
