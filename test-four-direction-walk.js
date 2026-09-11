@@ -17,22 +17,16 @@ function extractFunction(name) {
 
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('nextWalkDirection')}\nthis.next=nextWalkDirection;`, context);
+vm.runInContext(`${extractFunction('getWalkPattern')}\nthis.pattern=getWalkPattern();`, context);
+const seen = JSON.parse(JSON.stringify(context.pattern));
+assert.deepStrictEqual(seen, ['KeyD', 'KeyD', 'KeyW', 'KeyA', 'KeyA', 'KeyS']);
 
-let current = 'KeyS';
-const seen = [];
-for (let i = 0; i < 4; i++) {
-  current = context.next(current);
-  seen.push(current);
-}
-assert.deepStrictEqual(seen, ['KeyD', 'KeyW', 'KeyA', 'KeyS']);
-assert.deepStrictEqual(new Set(seen), new Set(['KeyA', 'KeyD', 'KeyW', 'KeyS']));
-const displacement = seen.reduce((p, direction) => {
-  if (direction === 'KeyD') p.x++;
-  if (direction === 'KeyA') p.x--;
-  if (direction === 'KeyW') p.y++;
-  if (direction === 'KeyS') p.y--;
-  return p;
+const displacement = seen.reduce((position, direction) => {
+  if (direction === 'KeyD') position.x++;
+  if (direction === 'KeyA') position.x--;
+  if (direction === 'KeyW') position.y++;
+  if (direction === 'KeyS') position.y--;
+  return position;
 }, { x: 0, y: 0 });
 assert.deepStrictEqual(displacement, { x: 0, y: 0 });
-console.log('PASS: walking makes a right up left down loop back to start');
+console.log('PASS: walking makes a 2-right up 2-left down loop back to start');

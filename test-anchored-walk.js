@@ -14,13 +14,11 @@ function extractFunction(name) {
 }
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('nextWalkDirection')}\nthis.next=nextWalkDirection;`, context);
-let direction = 'KeyS';
+vm.runInContext(`${extractFunction('getWalkPattern')}\nthis.pattern=getWalkPattern();`, context);
 const position = { x: 0, y: 0 };
 let maxAbsX = 0;
 let maxAbsY = 0;
-for (let i = 0; i < 4; i++) {
-  direction = context.next(direction);
+for (const direction of context.pattern) {
   if (direction === 'KeyD') position.x++;
   if (direction === 'KeyA') position.x--;
   if (direction === 'KeyW') position.y++;
@@ -29,5 +27,5 @@ for (let i = 0; i < 4; i++) {
   maxAbsY = Math.max(maxAbsY, Math.abs(position.y));
 }
 assert.deepStrictEqual(position, { x: 0, y: 0 }, 'one loop must return to the anchor');
-assert(maxAbsX <= 1 && maxAbsY <= 1, 'loop must stay within one movement unit of the anchor');
-console.log('PASS: square loop stays near the anchor and returns to start');
+assert(maxAbsX <= 2 && maxAbsY <= 1, 'loop must stay inside its small rectangular area');
+console.log('PASS: rectangular loop stays near the anchor and returns to start');

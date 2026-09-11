@@ -36,7 +36,7 @@
 
     let isBusy = false;
     let isHoldingFish = false;
-    let walkDirection = 'KeyS';
+    let walkStepIndex = -1;
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
@@ -388,10 +388,8 @@
     // AUTO-WALK DI RUMPUT (JIKA TIDAK SEDANG MANCING)
     // =========================================================================
 
-    function nextWalkDirection(current) {
-        const directions = ['KeyD', 'KeyW', 'KeyA', 'KeyS'];
-        const index = directions.indexOf(current);
-        return directions[(index + 1) % directions.length];
+    function getWalkPattern() {
+        return ['KeyD', 'KeyD', 'KeyW', 'KeyA', 'KeyA', 'KeyS'];
     }
 
     function getWalkControl(direction) {
@@ -420,11 +418,13 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        walkDirection = nextWalkDirection(walkDirection);
+        const walkPattern = getWalkPattern();
+        walkStepIndex = (walkStepIndex + 1) % walkPattern.length;
+        const walkDirection = walkPattern[walkStepIndex];
         const { label } = getWalkControl(walkDirection);
 
-        // Empat langkah membentuk putaran kanan → atas → kiri → bawah.
-        // Karena tiap arah berdurasi sama, satu putaran kembali ke titik awal.
+        // Enam langkah membentuk putaran kanan → kanan → atas → kiri → kiri → bawah.
+        // Karena jarak horizontal dan vertikal seimbang, putaran kembali ke titik awal.
         isWalking = true;
         try {
             updateStatus(`Exploring dekat titik awal... [${label}]`);
