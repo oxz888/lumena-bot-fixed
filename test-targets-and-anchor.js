@@ -20,5 +20,6 @@ const expected = [
 assert.deepStrictEqual(JSON.parse(JSON.stringify(context.CONFIG.TARGET_LIST)), expected);
 assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');
 assert.strictEqual(context.CONFIG.WALK_HOLD_MS, 75, 'movement duration must be exactly 75ms');
+assert.strictEqual(context.CONFIG.WALK_RUN_HOLD_MS, 500, 'continuous horizontal run must last exactly 500ms per direction');
 assert.strictEqual(context.CONFIG.WALK_STEP_DELAY_MS, 750, 'movement interval must be exactly 750ms');
 console.log('PASS: target list, shiny priority, and movement timing are exact');

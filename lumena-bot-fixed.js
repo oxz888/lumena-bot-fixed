@@ -19,6 +19,7 @@
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
         WALK_STEP_DELAY_MS: 750,
         WALK_HOLD_MS: 75,
+        WALK_RUN_HOLD_MS: 500,
         WALK_TURN_GAP_MS: 20,
         AUTO_WALK: true
     };
@@ -388,9 +389,7 @@
     // AUTO-WALK DI RUMPUT (JIKA TIDAK SEDANG MANCING)
     // =========================================================================
 
-    function getWalkRunPlan(stepDurationMs) {
-        // Tiga kali lebih jauh dari versi 225 ms sebelumnya.
-        const runDurationMs = stepDurationMs * 9;
+    function getWalkRunPlan(runDurationMs) {
         return [
             { direction: 'KeyD', holdMs: runDurationMs },
             { direction: 'KeyA', holdMs: runDurationMs }
@@ -423,10 +422,10 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        const runPlan = getWalkRunPlan(CONFIG.WALK_HOLD_MS);
+        const runPlan = getWalkRunPlan(CONFIG.WALK_RUN_HOLD_MS);
 
-        // Tahan kanan terus selama tiga langkah lalu langsung tahan kiri
-        // dengan durasi sama agar karakter berlari dan kembali ke titik awal.
+        // Tahan kanan selama 500 ms lalu langsung tahan kiri dengan durasi
+        // yang sama agar karakter berlari dan kembali ke titik awal.
         isWalking = true;
         try {
             for (let index = 0; index < runPlan.length; index++) {
