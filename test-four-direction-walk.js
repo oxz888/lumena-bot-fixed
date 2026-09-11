@@ -17,12 +17,11 @@ function extractFunction(name) {
 
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('getWalkPattern')}\nthis.pattern=getWalkPattern();`, context);
-const seen = JSON.parse(JSON.stringify(context.pattern));
-assert.deepStrictEqual(seen, ['KeyD', 'KeyD', 'KeyD', 'KeyA', 'KeyA', 'KeyA']);
-assert(!seen.includes('KeyW') && !seen.includes('KeyS'), 'movement must remain horizontal');
-
-const displacement = seen.reduce((x, direction) =>
-  x + (direction === 'KeyD' ? 1 : direction === 'KeyA' ? -1 : 0), 0);
-assert.strictEqual(displacement, 0, 'three right and three left steps must return to start');
-console.log('PASS: walking runs 3 steps right then 3 steps left');
+vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(75);`, context);
+const plan = JSON.parse(JSON.stringify(context.plan));
+assert.deepStrictEqual(plan, [
+  { direction: 'KeyD', holdMs: 225 },
+  { direction: 'KeyA', holdMs: 225 }
+]);
+assert.strictEqual(plan[0].holdMs, plan[1].holdMs, 'return run must match outbound run');
+console.log('PASS: walking holds right for 3 steps then immediately holds left for 3 steps');

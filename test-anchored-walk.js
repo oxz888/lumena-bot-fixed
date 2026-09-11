@@ -14,19 +14,17 @@ function extractFunction(name) {
 }
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('getWalkPattern')}\nthis.pattern=getWalkPattern();`, context);
-const position = { x: 0, y: 0 };
-let maxAbsX = 0;
-let maxAbsY = 0;
-for (const direction of context.pattern) {
-  if (direction === 'KeyD') position.x++;
-  if (direction === 'KeyA') position.x--;
-  if (direction === 'KeyW') position.y++;
-  if (direction === 'KeyS') position.y--;
-  maxAbsX = Math.max(maxAbsX, Math.abs(position.x));
-  maxAbsY = Math.max(maxAbsY, Math.abs(position.y));
+vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(75);`, context);
+const plan = JSON.parse(JSON.stringify(context.plan));
+let horizontalDuration = 0;
+let verticalDuration = 0;
+for (const phase of plan) {
+  if (phase.direction === 'KeyD') horizontalDuration += phase.holdMs;
+  if (phase.direction === 'KeyA') horizontalDuration -= phase.holdMs;
+  if (phase.direction === 'KeyW') verticalDuration += phase.holdMs;
+  if (phase.direction === 'KeyS') verticalDuration -= phase.holdMs;
 }
-assert.deepStrictEqual(position, { x: 0, y: 0 }, 'one loop must return to the anchor');
-assert(maxAbsX <= 3, 'loop must stay within three horizontal movement units of the anchor');
-assert.strictEqual(maxAbsY, 0, 'loop must never move vertically');
-console.log('PASS: horizontal loop stays near the anchor and returns to start');
+assert.strictEqual(horizontalDuration, 0, 'right and left hold durations must balance');
+assert.strictEqual(verticalDuration, 0, 'run must have no vertical movement');
+assert.strictEqual(plan.length, 2, 'the return run must start immediately after the outbound run');
+console.log('PASS: continuous horizontal run balances back to the anchor');

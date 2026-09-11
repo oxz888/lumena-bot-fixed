@@ -19,6 +19,7 @@
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
         WALK_STEP_DELAY_MS: 750,
         WALK_HOLD_MS: 75,
+        WALK_TURN_GAP_MS: 20,
         AUTO_WALK: true
     };
 
@@ -36,7 +37,6 @@
 
     let isBusy = false;
     let isHoldingFish = false;
-    let walkStepIndex = -1;
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
@@ -388,8 +388,12 @@
     // AUTO-WALK DI RUMPUT (JIKA TIDAK SEDANG MANCING)
     // =========================================================================
 
-    function getWalkPattern() {
-        return ['KeyD', 'KeyD', 'KeyD', 'KeyA', 'KeyA', 'KeyA'];
+    function getWalkRunPlan(stepDurationMs) {
+        const runDurationMs = stepDurationMs * 3;
+        return [
+            { direction: 'KeyD', holdMs: runDurationMs },
+            { direction: 'KeyA', holdMs: runDurationMs }
+        ];
     }
 
     function getWalkControl(direction) {
@@ -401,12 +405,12 @@
         }[direction];
     }
 
-    async function pulseWalkKey(direction) {
+    async function pulseWalkKey(direction, holdMs = CONFIG.WALK_HOLD_MS) {
         const { key, keyCode } = getWalkControl(direction);
         window.dispatchEvent(new KeyboardEvent('keydown', {
             bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
         }));
-        await sleep(CONFIG.WALK_HOLD_MS);
+        await sleep(holdMs);
         window.dispatchEvent(new KeyboardEvent('keyup', {
             bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
         }));
@@ -418,17 +422,19 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        const walkPattern = getWalkPattern();
-        walkStepIndex = (walkStepIndex + 1) % walkPattern.length;
-        const walkDirection = walkPattern[walkStepIndex];
-        const { label } = getWalkControl(walkDirection);
+        const runPlan = getWalkRunPlan(CONFIG.WALK_HOLD_MS);
 
-        // Bergerak lurus tiga langkah ke kanan lalu tiga langkah kembali ke kiri.
-        // Jarak horizontal seimbang sehingga putaran kembali ke titik awal.
+        // Tahan kanan terus selama tiga langkah lalu langsung tahan kiri
+        // dengan durasi sama agar karakter berlari dan kembali ke titik awal.
         isWalking = true;
         try {
-            updateStatus(`Exploring dekat titik awal... [${label}]`);
-            await pulseWalkKey(walkDirection);
+            for (let index = 0; index < runPlan.length; index++) {
+                const phase = runPlan[index];
+                const { label } = getWalkControl(phase.direction);
+                updateStatus(`Lari ${label} dekat titik awal...`);
+                await pulseWalkKey(phase.direction, phase.holdMs);
+                if (index < runPlan.length - 1) await sleep(CONFIG.WALK_TURN_GAP_MS);
+            }
         } finally {
             isWalking = false;
         }
