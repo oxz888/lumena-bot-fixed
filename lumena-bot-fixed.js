@@ -38,6 +38,7 @@
 
     let isBusy = false;
     let isHoldingFish = false;
+    let walkDirection = 'KeyD';
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
@@ -396,6 +397,10 @@
         ];
     }
 
+    function getOppositeWalkDirection(direction) {
+        return direction === 'KeyD' ? 'KeyA' : 'KeyD';
+    }
+
     function getWalkControl(direction) {
         return {
             KeyD: { key: 'd', keyCode: 68, label: 'kanan' },
@@ -410,10 +415,13 @@
         window.dispatchEvent(new KeyboardEvent('keydown', {
             bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
         }));
-        await sleep(holdMs);
-        window.dispatchEvent(new KeyboardEvent('keyup', {
-            bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
-        }));
+        try {
+            await sleep(holdMs);
+        } finally {
+            window.dispatchEvent(new KeyboardEvent('keyup', {
+                bubbles: true, cancelable: true, key, code: direction, keyCode, which: keyCode
+            }));
+        }
     }
 
     async function triggerWalkStep() {
@@ -422,19 +430,16 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        const runPlan = getWalkRunPlan(CONFIG.WALK_RUN_HOLD_MS);
-
-        // Tahan kanan selama 500 ms lalu langsung tahan kiri dengan durasi
-        // yang sama agar karakter berlari dan kembali ke titik awal.
+        // Jalankan hanya satu fase per giliran. Jika battle muncul sesudah
+        // lari kanan, fase kiri tetap tersimpan dan dijalankan pertama kali
+        // setelah kembali ke map, sehingga return tidak hilang saat battle.
+        const direction = walkDirection;
+        const { label } = getWalkControl(direction);
         isWalking = true;
         try {
-            for (let index = 0; index < runPlan.length; index++) {
-                const phase = runPlan[index];
-                const { label } = getWalkControl(phase.direction);
-                updateStatus(`Lari ${label} dekat titik awal...`);
-                await pulseWalkKey(phase.direction, phase.holdMs);
-                if (index < runPlan.length - 1) await sleep(CONFIG.WALK_TURN_GAP_MS);
-            }
+            updateStatus(`Lari ${label} dekat titik awal...`);
+            await pulseWalkKey(direction, CONFIG.WALK_RUN_HOLD_MS);
+            walkDirection = getOppositeWalkDirection(direction);
         } finally {
             isWalking = false;
         }
