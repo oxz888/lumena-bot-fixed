@@ -10,12 +10,12 @@ vm.createContext(context);
 vm.runInContext(source.slice(start, end).replace('const CONFIG', 'this.CONFIG'), context);
 
 const expected = [
-  'Transmole', 'Marebyte', 'Lotlume', 'Lithlet', 'Cairnling',
-  'Glimfin', 'Cinderook', 'Combustler', 'Sparkit', 'Volterin',
-  'Ditpuff', 'Mimicorp', 'Starcalf', 'Cosmox', 'Compasspook',
-  'Astrowraith', 'Nullimp', 'Voidling', 'Murkub', 'Cindergill',
-  'Capsylex', 'Corekit', 'Lunaveil', 'Chronobra', 'Etherion',
-  'Solshade', 'Bitauro', 'Mythrex', 'Originu', 'Lunimp', 'Vowraith'
+  'Transmole', 'Marebyte', 'Lithlet', 'Cairnling', 'Glimfin',
+  'Cinderook', 'Combustler', 'Volterin', 'Ditpuff', 'Mimicorp',
+  'Starcalf', 'Cosmox', 'Compasspook', 'Astrowraith', 'Nullimp',
+  'Voidling', 'Murkub', 'Cindergill', 'Capsylex', 'Corekit',
+  'Lunaveil', 'Chronobra', 'Etherion', 'Solshade', 'Bitauro',
+  'Mythrex', 'Originu', 'Lunimp', 'Vowraith'
 ];
 assert.deepStrictEqual(JSON.parse(JSON.stringify(context.CONFIG.TARGET_LIST)), expected);
 assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');

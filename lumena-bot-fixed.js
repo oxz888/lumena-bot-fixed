@@ -5,12 +5,12 @@
 
     const CONFIG = {
         TARGET_LIST: [
-            "Transmole", "Marebyte", "Lotlume", "Lithlet", "Cairnling", "Glimfin",
-            "Cinderook", "Combustler", "Sparkit", "Volterin", "Ditpuff",
-            "Mimicorp", "Starcalf", "Cosmox", "Compasspook", "Astrowraith",
-            "Nullimp", "Voidling", "Murkub", "Cindergill", "Capsylex",
-            "Corekit", "Lunaveil", "Chronobra", "Etherion", "Solshade",
-            "Bitauro", "Mythrex", "Originu", "Lunimp", "Vowraith"
+            "Transmole", "Marebyte", "Lithlet", "Cairnling", "Glimfin",
+            "Cinderook", "Combustler", "Volterin", "Ditpuff", "Mimicorp",
+            "Starcalf", "Cosmox", "Compasspook", "Astrowraith", "Nullimp",
+            "Voidling", "Murkub", "Cindergill", "Capsylex", "Corekit",
+            "Lunaveil", "Chronobra", "Etherion", "Solshade", "Bitauro",
+            "Mythrex", "Originu", "Lunimp", "Vowraith"
         ],
         ALWAYS_CATCH_SHINY: true,
         XP_FARM_OTHERS: true,
