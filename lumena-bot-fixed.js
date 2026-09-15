@@ -25,7 +25,8 @@
             "Sigilisk", "Sporelet", "Mycogrin", "Blazekhan", "Loomling", "Webloom",
             "Dunebug", "Kilnscarab", "Coralit", "Reefcrest", "Sandip", "Dunedillo",
             "Glacub", "Frostursa", "Sparkit", "Dynarook", "Hauntbud", "Mournebloom",
-            "Indexowl", "Voidrake", "Ashplume", "Nivemite"
+            "Indexowl", "Voidrake", "Ashplume", "Nivemite", "cindervox", "Flarecrest",
+            "Chrysnow"
         ],
         ALWAYS_CATCH_SHINY: true,
         XP_FARM_OTHERS: true,
