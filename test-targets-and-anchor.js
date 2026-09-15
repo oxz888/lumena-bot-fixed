@@ -30,10 +30,10 @@ const expected = [
   'Sigilisk', 'Sporelet', 'Mycogrin', 'Blazekhan', 'Loomling', 'Webloom',
   'Dunebug', 'Kilnscarab', 'Coralit', 'Reefcrest', 'Sandip', 'Dunedillo',
   'Glacub', 'Frostursa', 'Sparkit', 'Dynarook', 'Hauntbud', 'Mournebloom',
-  'Indexowl', 'Voidrake'
+  'Indexowl', 'Voidrake', 'Ashplume', 'Nivemite'
 ];
 assert.deepStrictEqual(JSON.parse(JSON.stringify(context.CONFIG.EXCLUDED_LIST)), expected);
-assert.strictEqual(expected.length, 121, 'excluded list must contain exactly 121 Lumens');
+assert.strictEqual(expected.length, 123, 'excluded list must contain exactly 123 Lumens');
 assert.strictEqual(context.CONFIG.TARGET_LIST, undefined, 'legacy positive target list must not remain active');
 assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');
 assert.strictEqual(context.CONFIG.WALK_HOLD_MS, 75, 'movement duration must be exactly 75ms');
