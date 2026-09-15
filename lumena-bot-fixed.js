@@ -4,13 +4,28 @@
     if (oldHud) oldHud.remove();
 
     const CONFIG = {
-        TARGET_LIST: [
-            "Transmole", "Marebyte", "Lithlet", "Cairnling", "Glimfin",
-            "Cinderook", "Combustler", "Volterin", "Ditpuff", "Mimicorp",
-            "Starcalf", "Cosmox", "Compasspook", "Astrowraith", "Nullimp",
-            "Voidling", "Murkub", "Cindergill", "Capsylex", "Corekit",
-            "Lunaveil", "Chronobra", "Etherion", "Solshade", "Bitauro",
-            "Mythrex", "Originu", "Lunimp", "Vowraith"
+        EXCLUDED_LIST: [
+            "Pyrapup", "Flamynx", "Pyrolynx", "Spriglet", "Leafawn", "Floradeer",
+            "Tideot", "Surfinn", "Aqualisk", "Nibbug", "Cocoonib", "Papilume",
+            "Peckit", "Talonote", "Harrowl", "Scratbit", "Raccoil", "Tadpool",
+            "Croaklet", "Tempoad", "Wicklet", "Candlume", "Blazewick", "Orcaflux",
+            "Levisurge", "Vaultle", "Turvault", "Bastortoise", "Coinu", "Aurinu",
+            "Menhiron", "Prispine", "Luminray", "Rootlet", "Bloomkin", "Voltike",
+            "Dojohrm", "Shellix", "Crystail", "Pebloon", "Graviboon", "Gravolith",
+            "Driftle", "Cloudruff", "Nimbushear", "Nibfox", "Nyflare", "Sonarfox",
+            "Lumorb", "Glorial", "Kelpuff", "Kelploom", "Quibblet", "Quibshade",
+            "Aurapod", "Auracarap", "Flintot", "Bristleflint", "Cindercrag", "Minnote",
+            "Choraleel", "Sirenote", "Bytebat", "Noctobyte", "Orebit", "Geodorm",
+            "Mantyrite", "Skorinch", "Scorivault", "Mandrillip", "Bramblejin",
+            "Venomandrake", "Spritzle", "Mistelle", "Pufflit", "Aukrora", "Slugmaw",
+            "Miremaw", "Pebbun", "Quarryhare", "Lotlume", "Axolight", "Thornyte",
+            "Hedgeryl", "Scrappling", "Lockjawler", "Vapool", "Vapormane", "Tinpin",
+            "Steelark", "Pixseed", "Charmbloom", "Cinduck", "Ashquack", "Skyrill",
+            "Jetstream", "Sparririt", "Vowdojo", "Snoflit", "Frostelle", "Glyphlet",
+            "Sigilisk", "Sporelet", "Mycogrin", "Blazekhan", "Loomling", "Webloom",
+            "Dunebug", "Kilnscarab", "Coralit", "Reefcrest", "Sandip", "Dunedillo",
+            "Glacub", "Frostursa", "Sparkit", "Dynarook", "Hauntbud", "Mournebloom",
+            "Indexowl", "Voidrake"
         ],
         ALWAYS_CATCH_SHINY: true,
         XP_FARM_OTHERS: true,
@@ -24,7 +39,14 @@
         AUTO_WALK: true
     };
 
-    const TARGET_SET = new Set(CONFIG.TARGET_LIST.map(n => n.trim().toLowerCase()));
+    const EXCLUDED_SET = new Set(CONFIG.EXCLUDED_LIST.map(n => n.trim().toLowerCase()));
+
+    function shouldCaptureLumen(name, isShiny) {
+        if (isShiny && CONFIG.ALWAYS_CATCH_SHINY) return true;
+        const normalizedName = (name || '').trim().toLowerCase();
+        if (!normalizedName || normalizedName === 'unknown lumen') return false;
+        return !EXCLUDED_SET.has(normalizedName);
+    }
 
     const STATS = {
         encounters: 0,
@@ -483,8 +505,7 @@
             if (isHoldingFish) releaseFishHold();
 
             const enemy = detectEnemyLumen();
-            const normalizedName = enemy.name.toLowerCase().trim();
-            const isTarget = TARGET_SET.has(normalizedName);
+            const shouldCapture = shouldCaptureLumen(enemy.name, enemy.isShiny);
             const gradeDecision = evaluateGradeCapture(enemy.grades);
 
             if (enemy.isShiny) {
@@ -496,8 +517,8 @@
                     renderHUD();
                 }
                 await executeCapture();
-            } else if (isTarget) {
-                updateStatus(`🎯 TARGET: [${enemy.name}]! Tangkap...`);
+            } else if (shouldCapture) {
+                updateStatus(`🎯 BARU: [${enemy.name}] tidak ada di skip list! Tangkap...`);
                 if (!activeEncounterHandled) {
                     STATS.encounters++;
                     STATS.targetCaught++;
@@ -515,7 +536,7 @@
                 }
                 await executeCapture();
             } else {
-                updateStatus(`⚔️ XP FARM: [${enemy.name}]! Serang...`);
+                updateStatus(`⚔️ SKIP LIST: [${enemy.name}]! Serang...`);
                 if (!activeEncounterHandled) {
                     STATS.encounters++;
                     STATS.xpFarmed++;
@@ -604,11 +625,11 @@
                 </div>
                 <div style="display: flex; gap: 4px;">
                     <button id="bot-target-btn" style="flex: 1; background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 5px; padding: 4px 0; font-size: 10px; cursor: pointer;">
-                        Targets (${CONFIG.TARGET_LIST.length})
+                        Skip List (${CONFIG.EXCLUDED_LIST.length})
                     </button>
                 </div>
                 <div id="bot-target-dropdown" style="display: none; margin-top: 6px; max-height: 100px; overflow-y: auto; background: #0d1117; padding: 5px; border-radius: 4px; border: 1px solid #30363d; font-size: 9px; color: #8b949e;">
-                    ${CONFIG.TARGET_LIST.map(n => `<div>• ${n}</div>`).join('')}
+                    ${CONFIG.EXCLUDED_LIST.map(n => `<div>• ${n}</div>`).join('')}
                 </div>
             </div>
         `;
