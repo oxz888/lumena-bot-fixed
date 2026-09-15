@@ -19,7 +19,7 @@
         SCAN_INTERVAL_MS: 400, // Interval lebih responsif untuk pancing
         WALK_STEP_DELAY_MS: 750,
         WALK_HOLD_MS: 75,
-        WALK_RUN_HOLD_MS: 500,
+        WALK_RUN_HOLD_MS: 450,
         WALK_TURN_GAP_MS: 20,
         AUTO_WALK: true
     };

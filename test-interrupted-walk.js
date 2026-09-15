@@ -19,7 +19,7 @@ function extractFunction(name) {
 (async () => {
   const keydowns = [];
   const context = {
-    CONFIG: { AUTO_WALK: true, WALK_STEP_DELAY_MS: 750, WALK_HOLD_MS: 75, WALK_RUN_HOLD_MS: 500 },
+    CONFIG: { AUTO_WALK: true, WALK_STEP_DELAY_MS: 750, WALK_HOLD_MS: 75, WALK_RUN_HOLD_MS: 450 },
     isWalking: false,
     walkDirection: 'KeyD',
     lastWalkTime: 0,

@@ -17,11 +17,11 @@ function extractFunction(name) {
 
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(500);`, context);
+vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(450);`, context);
 const plan = JSON.parse(JSON.stringify(context.plan));
 assert.deepStrictEqual(plan, [
-  { direction: 'KeyD', holdMs: 500 },
-  { direction: 'KeyA', holdMs: 500 }
+  { direction: 'KeyD', holdMs: 450 },
+  { direction: 'KeyA', holdMs: 450 }
 ]);
 assert.strictEqual(plan[0].holdMs, plan[1].holdMs, 'return run must match outbound run');
-console.log('PASS: horizontal run holds each direction for exactly 500 ms');
+console.log('PASS: horizontal run holds each direction for exactly 450 ms');

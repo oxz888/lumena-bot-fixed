@@ -14,7 +14,7 @@ function extractFunction(name) {
 }
 const context = {};
 vm.createContext(context);
-vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(500);`, context);
+vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(450);`, context);
 const plan = JSON.parse(JSON.stringify(context.plan));
 let horizontalDuration = 0;
 let verticalDuration = 0;
