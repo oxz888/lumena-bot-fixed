@@ -25,6 +25,7 @@ for (const phase of plan) {
   if (phase.direction === 'KeyS') verticalDuration -= phase.holdMs;
 }
 assert.strictEqual(horizontalDuration, 0, 'right and left hold durations must balance');
-assert.strictEqual(verticalDuration, 0, 'run must have no vertical movement');
-assert.strictEqual(plan.length, 2, 'the return run must start immediately after the outbound run');
-console.log('PASS: continuous horizontal run balances back to the anchor');
+assert.strictEqual(verticalDuration, 0, 'up and down hold durations must balance');
+assert.strictEqual(plan.length, 4, 'the route must contain all four sides of the square');
+assert.deepStrictEqual(plan.map(phase => phase.direction), ['KeyD', 'KeyW', 'KeyA', 'KeyS']);
+console.log('PASS: square run balances back to the starting anchor');

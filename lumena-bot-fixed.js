@@ -416,12 +416,16 @@
     function getWalkRunPlan(runDurationMs) {
         return [
             { direction: 'KeyD', holdMs: runDurationMs },
-            { direction: 'KeyA', holdMs: runDurationMs }
+            { direction: 'KeyW', holdMs: runDurationMs },
+            { direction: 'KeyA', holdMs: runDurationMs },
+            { direction: 'KeyS', holdMs: runDurationMs }
         ];
     }
 
-    function getOppositeWalkDirection(direction) {
-        return direction === 'KeyD' ? 'KeyA' : 'KeyD';
+    function getNextWalkDirection(direction) {
+        const squareRoute = ['KeyD', 'KeyW', 'KeyA', 'KeyS'];
+        const currentIndex = squareRoute.indexOf(direction);
+        return squareRoute[(currentIndex + 1) % squareRoute.length];
     }
 
     function getWalkControl(direction) {
@@ -453,16 +457,16 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        // Jalankan hanya satu fase per giliran. Jika battle muncul sesudah
-        // lari kanan, fase kiri tetap tersimpan dan dijalankan pertama kali
-        // setelah kembali ke map, sehingga return tidak hilang saat battle.
+        // Jalankan hanya satu sisi persegi per giliran. Jika battle muncul,
+        // sisi berikutnya tetap tersimpan dan dilanjutkan setelah kembali ke
+        // map: kanan -> atas -> kiri -> bawah -> kembali ke titik awal.
         const direction = walkDirection;
         const { label } = getWalkControl(direction);
         isWalking = true;
         try {
-            updateStatus(`Lari ${label} dekat titik awal...`);
+            updateStatus(`Lari ${label} mengelilingi titik awal...`);
             await pulseWalkKey(direction, CONFIG.WALK_RUN_HOLD_MS);
-            walkDirection = getOppositeWalkDirection(direction);
+            walkDirection = getNextWalkDirection(direction);
         } finally {
             isWalking = false;
         }

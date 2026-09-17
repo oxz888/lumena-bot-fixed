@@ -21,7 +21,9 @@ vm.runInContext(`${extractFunction('getWalkRunPlan')}\nthis.plan=getWalkRunPlan(
 const plan = JSON.parse(JSON.stringify(context.plan));
 assert.deepStrictEqual(plan, [
   { direction: 'KeyD', holdMs: 450 },
-  { direction: 'KeyA', holdMs: 450 }
+  { direction: 'KeyW', holdMs: 450 },
+  { direction: 'KeyA', holdMs: 450 },
+  { direction: 'KeyS', holdMs: 450 }
 ]);
-assert.strictEqual(plan[0].holdMs, plan[1].holdMs, 'return run must match outbound run');
-console.log('PASS: horizontal run holds each direction for exactly 450 ms');
+assert.ok(plan.every(phase => phase.holdMs === 450), 'all four sides must run for exactly 450 ms');
+console.log('PASS: square run uses right, up, left, down for exactly 450 ms each');
