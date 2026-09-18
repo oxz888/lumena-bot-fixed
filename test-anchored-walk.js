@@ -26,6 +26,6 @@ for (const phase of plan) {
 }
 assert.strictEqual(horizontalDuration, 0, 'right and left hold durations must balance');
 assert.strictEqual(verticalDuration, 0, 'up and down hold durations must balance');
-assert.strictEqual(plan.length, 4, 'the route must contain all four sides of the square');
-assert.deepStrictEqual(plan.map(phase => phase.direction), ['KeyD', 'KeyW', 'KeyA', 'KeyS']);
-console.log('PASS: square run balances back to the starting anchor');
+assert.strictEqual(plan.length, 2, 'the route must contain down and up phases');
+assert.deepStrictEqual(plan.map(phase => phase.direction), ['KeyS', 'KeyW']);
+console.log('PASS: vertical down-up run balances back to the starting anchor');

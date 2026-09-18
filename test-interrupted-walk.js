@@ -22,7 +22,7 @@ function extractFunction(name) {
   const context = {
     CONFIG: { AUTO_WALK: true, WALK_STEP_DELAY_MS: 750, WALK_HOLD_MS: 75, WALK_RUN_HOLD_MS: 450 },
     isWalking: false,
-    walkDirection: 'KeyD',
+    walkDirection: 'KeyS',
     lastWalkTime: 0,
     battle: false,
     document: { querySelector: () => null },
@@ -45,26 +45,19 @@ function extractFunction(name) {
   ].join('\n'), context);
 
   await context.triggerWalkStep();
-  assert.deepStrictEqual(keydowns, ['KeyD']);
-  assert.strictEqual(context.walkDirection, 'KeyW', 'up phase must remain pending after right run');
+  assert.deepStrictEqual(keydowns, ['KeyS']);
+  assert.strictEqual(context.walkDirection, 'KeyW', 'up return must remain pending after down run');
 
   context.battle = true;
   context.Date.now = () => 2000;
   await context.triggerWalkStep();
-  assert.deepStrictEqual(keydowns, ['KeyD'], 'movement must not be consumed while battle is visible');
+  assert.deepStrictEqual(keydowns, ['KeyS'], 'movement must not be consumed while battle is visible');
   assert.strictEqual(context.walkDirection, 'KeyW');
 
   context.battle = false;
   await context.triggerWalkStep();
-  assert.deepStrictEqual(keydowns, ['KeyD', 'KeyW'], 'first free-roam movement after battle must resume with the owed up phase');
-  assert.strictEqual(context.walkDirection, 'KeyA');
-
-  context.Date.now = () => 3000;
-  await context.triggerWalkStep();
-  context.Date.now = () => 4000;
-  await context.triggerWalkStep();
-  assert.deepStrictEqual(keydowns, ['KeyD', 'KeyW', 'KeyA', 'KeyS']);
-  assert.deepStrictEqual(keyups, ['KeyD', 'KeyW', 'KeyA', 'KeyS'], 'every square-route keydown must have a matching keyup');
-  assert.strictEqual(context.walkDirection, 'KeyD', 'full square must cycle back to the right phase');
-  console.log('PASS: battle cannot consume the owed square-route phase');
+  assert.deepStrictEqual(keydowns, ['KeyS', 'KeyW'], 'first free-roam movement after battle must resume with the owed up phase');
+  assert.deepStrictEqual(keyups, ['KeyS', 'KeyW'], 'every vertical-route keydown must have a matching keyup');
+  assert.strictEqual(context.walkDirection, 'KeyS', 'full down-up cycle must return to the down phase');
+  console.log('PASS: battle cannot consume the owed vertical return phase');
 })().catch(error => { console.error(error); process.exit(1); });

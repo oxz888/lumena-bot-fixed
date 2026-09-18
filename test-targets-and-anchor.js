@@ -38,6 +38,6 @@ assert.strictEqual(expected.length, 126, 'excluded list must contain exactly 126
 assert.strictEqual(context.CONFIG.TARGET_LIST, undefined, 'legacy positive target list must not remain active');
 assert.strictEqual(context.CONFIG.ALWAYS_CATCH_SHINY, true, 'all shiny Lumens must remain priority capture targets');
 assert.strictEqual(context.CONFIG.WALK_HOLD_MS, 75, 'movement duration must be exactly 75ms');
-assert.strictEqual(context.CONFIG.WALK_RUN_HOLD_MS, 450, 'square route must last exactly 450ms per direction');
+assert.strictEqual(context.CONFIG.WALK_RUN_HOLD_MS, 450, 'vertical route must last exactly 450ms per direction');
 assert.strictEqual(context.CONFIG.WALK_STEP_DELAY_MS, 750, 'movement interval must be exactly 750ms');
 console.log('PASS: excluded list, shiny priority, and movement timing are exact');

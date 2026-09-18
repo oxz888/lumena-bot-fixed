@@ -61,7 +61,7 @@
 
     let isBusy = false;
     let isHoldingFish = false;
-    let walkDirection = 'KeyD';
+    let walkDirection = 'KeyS';
     let lastWalkTime = 0;
     let lastFishCastTime = 0;
     let activeEncounterHandled = false;
@@ -415,17 +415,13 @@
 
     function getWalkRunPlan(runDurationMs) {
         return [
-            { direction: 'KeyD', holdMs: runDurationMs },
-            { direction: 'KeyW', holdMs: runDurationMs },
-            { direction: 'KeyA', holdMs: runDurationMs },
-            { direction: 'KeyS', holdMs: runDurationMs }
+            { direction: 'KeyS', holdMs: runDurationMs },
+            { direction: 'KeyW', holdMs: runDurationMs }
         ];
     }
 
     function getNextWalkDirection(direction) {
-        const squareRoute = ['KeyD', 'KeyW', 'KeyA', 'KeyS'];
-        const currentIndex = squareRoute.indexOf(direction);
-        return squareRoute[(currentIndex + 1) % squareRoute.length];
+        return direction === 'KeyS' ? 'KeyW' : 'KeyS';
     }
 
     function getWalkControl(direction) {
@@ -457,14 +453,13 @@
         if (now - lastWalkTime < CONFIG.WALK_STEP_DELAY_MS) return;
         lastWalkTime = now;
 
-        // Jalankan hanya satu sisi persegi per giliran. Jika battle muncul,
-        // sisi berikutnya tetap tersimpan dan dilanjutkan setelah kembali ke
-        // map: kanan -> atas -> kiri -> bawah -> kembali ke titik awal.
+        // Jalankan satu fase vertikal per giliran. Jika battle muncul, fase
+        // berikutnya tetap tersimpan: bawah -> atas -> kembali ke titik awal.
         const direction = walkDirection;
         const { label } = getWalkControl(direction);
         isWalking = true;
         try {
-            updateStatus(`Lari ${label} mengelilingi titik awal...`);
+            updateStatus(`Lari ${label} dekat titik awal...`);
             await pulseWalkKey(direction, CONFIG.WALK_RUN_HOLD_MS);
             walkDirection = getNextWalkDirection(direction);
         } finally {
